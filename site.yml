@@ -1,0 +1,31 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+          - name: install updates (Red Hat)
+            tags: always
+            dnf:
+                    update_only: yes
+                    update_cache: yes
+
+- hosts: primary_servers
+  become: true
+  tasks:
+          - name: install httpd and telnet package
+            tags: httpd,telnet
+            yum:
+                    name:
+                            - httpd
+                            - telnet
+                    state: latest
+
+- hosts: secondary_servers
+  become: true
+  tasks:
+          - name: install mariadb package (Red Hat)
+            tags: mariadb,db
+            dnf:
+                    name: mariadb
+                    state: latest
+                    
