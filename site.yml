@@ -20,6 +20,15 @@
                             - telnet
                     state: latest
 
+          - name: copy default html file for site
+            tags: httpd,file
+            copy:
+                    src: default_site.html
+                    dest: /var/www/html/index.html
+                    owner: root
+                    group: root
+                    mode: 0644
+
 - hosts: secondary_servers
   become: true
   tasks:
@@ -28,4 +37,13 @@
             dnf:
                     name: mariadb
                     state: latest
+
+          - name: copy default html file for site
+            tags: secondary,db
+            copy:
+                    src: default_site.html
+                    dest: /var/www/html/index.html
+                    owner: root
+                    group: root
+                    mode: 0644
                     
