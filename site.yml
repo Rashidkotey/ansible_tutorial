@@ -20,14 +20,6 @@
                             - telnet
                     state: latest
 
-          - name: copy default html file for site
-            tags: httpd,file
-            copy:
-                    src: default_site.html
-                    dest: /var/www/html/index.html
-                    owner: root
-                    group: root
-                    mode: 0644
 
 - hosts: secondary_servers
   become: true
@@ -47,3 +39,15 @@
                     group: root
                     mode: 0644
                     
+          - name: install unzip
+            package:
+                    name: unzip
+
+          - name: install terraform 
+            unarchive:
+                    src: terraform_1.7.0_linux_amd64.zip
+                    dest: /usr/local/bin
+                   # remote_src: yes
+                    mode: 0755
+                    owner: root
+                    group: root
