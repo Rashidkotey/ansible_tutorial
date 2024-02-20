@@ -3,11 +3,24 @@
 - hosts: all
   become: true
   pre_tasks:
-          - name: install updates (Red Hat)
+          - name: update repo cache (Red Hat)
             tags: always
             dnf:
-                    update_only: yes
                     update_cache: yes
+            changed_when: false
+
+
+- hosts: all
+  become: true
+  tasks: 
+
+        
+          - name: add ssh key for simone
+            tags: always
+            authorized_key:
+                    user: simone
+                    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILUfNm76u40NCsX+mUSnrAGOaNnpXX7nigW7pcor8EXa ansible"
+
 
 - hosts: primary_servers
   become: true
@@ -30,6 +43,21 @@
                     name: mariadb
                     state: latest
 
+          - name: change e-mail address for admin
+            tags: apache,redhat,httpd
+            lineinfile:
+                    path: /etc/httpd/conf/httpd.conf
+                    regexp: '^ServerAdmin'
+                    line: ServerAdmin somebody@example.com
+            register: httpd
+
+          - name: restart httpd (RedHat)
+            tags: apache,redhat,httpd
+            service:
+                    name: httpd
+                    state: restarted
+            when: httpd.changed
+
           - name: copy default html file for site
             tags: secondary,db
             copy:
@@ -51,3 +79,10 @@
                     mode: 0755
                     owner: root
                     group: root
+
+          - name: start httpd (RedHat)
+            tags: httpd,apache,redhat
+            service:
+                    name: httpd
+                    state: started
+
